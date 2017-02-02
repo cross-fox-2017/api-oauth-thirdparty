@@ -29,7 +29,13 @@ var Users = new Schema({
     token: String,
     email: String,
     displayName: String
-  }
+  },
+  github: {
+    id: String,
+    token: String,
+    email: String,
+    displayName: String
+  },
 });
 
 var users = mongoose.model('Users', Users);

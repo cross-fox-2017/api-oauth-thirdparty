@@ -46,4 +46,13 @@ module.exports = function(app, passport){
   }), function(req, res){
     console.log('success');
   })
+  app.get('/auth/github', passport.authenticate('github', { scope: [ 'user:email' ] }));
+  app.get('/auth/github/callback', passport.authenticate('github', {
+    successRedirect: '/',
+    failureRedirect: '/signup'
+  }), function(req, res) {
+      console.log('success');
+    });
+
+
 }
