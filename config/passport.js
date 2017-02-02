@@ -5,6 +5,7 @@ var hash = require('password-hash')
 var LocalStrategy = require('passport-local').Strategy
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy  = require('passport-twitter').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var User = require('../models/user.js')
 
@@ -61,6 +62,48 @@ module.exports = function(passport){
   ))
 
   passport.use(new TwitterStrategy({
-
+    consumerKey     : process.env.twitter_consumerKey,
+    consumerSecret  : process.env.twitter_consumerSecret,
+    callbackURL     : process.env.twitter_callbackURL
+  }, function(token, tokenSecret, profile, done){
+    User.findOne({'twitter.id': profile.id}, function(err, user) {
+      if (err) return done(err);
+      if (user){return done(null, user)
+      } else {
+        var newUser = new User();
+        newUser.twitter.id = profile.id;
+        newUser.twitter.token = token;
+        newUser.twitter.username = profile.username;
+        newUser.twitter.displayName = profile.displayName;
+        newUser.save(function(err){
+          if(err) throw err;
+          return done(null, newUser)
+        })
+      }
+    })
   }))
+
+  passport.use(new GoogleStrategy({
+    clientID: process.env.google_clientID,
+    clientSecret: process.env.google_clientSecret,
+    callbackURL: process.env.google_callbackURL
+  }, function(token, refreshToken, profile, done){
+    console.log(profile);
+    User.findOne({'google.id': profile.id}, function(err, user) {
+      if (err) return done(err);
+      if (user){return done(null, user)
+      } else {
+        var newUser = new User();
+        newUser.google.id = profile.id;
+        newUser.google.token = token;
+        newUser.google.name = profile.name;
+        newUser.google.email = profile.email[0].value;
+        newUser.save(function(err){
+          if(err) throw err;
+          return done(null, newUser)
+        })
+      }
+    })
+  }
+  ))
 }
