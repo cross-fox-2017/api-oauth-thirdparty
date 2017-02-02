@@ -6,6 +6,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 
+// mongoose
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test');
+mongoose.Promise = global.Promise;
+
 var index = require('./routes/index');
 // var users = require('./routes/users');
 
@@ -15,10 +20,7 @@ var apiSignup = require('./routes/api/signup');
 
 var app = express();
 
-// mongoose
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
-mongoose.Promise = global.Promise;
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
