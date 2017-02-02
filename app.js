@@ -10,6 +10,20 @@ var api = require('./routes/api');
 var facebook = require('./routes/auth/facebook');
 var google = require('./routes/auth/google');
 var twitter = require('./routes/auth/twitter');
+var passport = require('passport');
+// var FacebookStrategy = require('passport-facebook').Strategy
+//
+// passport.use(new FacebookStrategy({
+//     clientID: 741874725977340,
+//     clientSecret: "efb55922741c35217042db93ffdbd72d",
+//     callbackURL: "http://localhost:3000/auth/facebook/callback"
+//   },
+//   function(accessToken, refreshToken, profile, cb) {
+//     User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+//       return cb(err, user);
+//     });
+//   }
+// ));
 
 var app = express();
 
