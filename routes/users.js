@@ -5,4 +5,8 @@ const controller = require('../controllers/users')
 /* GET users listing. */
 router.post('/', controller.signup)
 
+router.get('/', controller.getUsers)
+
+router.delete('/:id', controller.delete)
+
 module.exports = router;
