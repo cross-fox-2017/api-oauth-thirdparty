@@ -1,5 +1,8 @@
 const Users = require('../models/users');
-var passwordHash = require('password-hash');
+const passwordHash = require('password-hash');
+const expressJWT = require('express-jwt');
+const jwt = require('jsonwebtoken');
+const token = require('../token');
 
 module.exports = {
   signup: (req, res) => {
@@ -38,5 +41,13 @@ module.exports = {
         res.send(response);
       }
     });
+  },
+  verify: (req,res,next) => {
+    let decoded = jwt.verify(req.header('auth'), 'secret');
+    if(decoded) {
+      next()
+    } else {
+      res.send("You don't have access!")
+    }
   }
 };

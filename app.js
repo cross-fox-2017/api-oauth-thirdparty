@@ -4,9 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+const passport = require('passport');
+// const FacebookTokenStrategy = require('passport-facebook-token');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var api = require('./routes/api')
 
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/oauth');
@@ -26,8 +29,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(passport.initialize());
+// app.use(passport.session());
+
+// passport.use(new FacebookTokenStrategy({
+//       clientID: "267057420394411",
+//       clientSecret: "0201668b55a2a69a5f912d00a0fce1cc"
+//   },
+//   function(accessToken, refreshToken, profile, done) {
+//       User.handleAuthentication(accessToken, refreshToken, profile, done, function(err, user) {
+//           console.log("handleAuthentication user is " + JSON.stringify(user));
+//           console.log("handleAuthentication error is " + JSON.stringify(err));
+//           done(err, user);
+//       });
+//   }
+// ));
+
 app.use('/', index);
 app.use('/api/users', users);
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
