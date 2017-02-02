@@ -16,12 +16,18 @@ var Users = new Schema({
     id: String,
     token: String,
     email: String,
-    name: String
+    displayName: String
   },
   twitter: {
     id: String,
     token: String,
     username: String,
+    displayName: String
+  },
+  google: {
+    id: String,
+    token: String,
+    email: String,
     displayName: String
   }
 });

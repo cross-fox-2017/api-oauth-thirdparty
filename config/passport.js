@@ -50,7 +50,7 @@ module.exports = function(passport){
           var newUser = new User();
           newUser.facebook.id = profile.id;
           newUser.facebook.token = token;
-          newUser.facebook.name = profile.displayName;
+          newUser.facebook.displayName = profile.displayName;
           // newUser.facebook.email = profile.email[0].value;
           newUser.save(function(err){
             if(err) throw err;
@@ -87,6 +87,7 @@ module.exports = function(passport){
     clientID: process.env.google_clientID,
     clientSecret: process.env.google_clientSecret,
     callbackURL: process.env.google_callbackURL
+    // redirect_uri: process.env.google_redirect_uri
   }, function(token, refreshToken, profile, done){
     console.log(profile);
     User.findOne({'google.id': profile.id}, function(err, user) {
@@ -96,8 +97,8 @@ module.exports = function(passport){
         var newUser = new User();
         newUser.google.id = profile.id;
         newUser.google.token = token;
-        newUser.google.name = profile.name;
-        newUser.google.email = profile.email[0].value;
+        newUser.google.displayName = profile.displayName;
+        newUser.google.email = profile.emails[0].value;
         newUser.save(function(err){
           if(err) throw err;
           return done(null, newUser)
