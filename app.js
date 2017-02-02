@@ -18,8 +18,9 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log(`connected to Port ${process.env.PORT} At ${process.env.MONGODB_URI}`);
-
 });
+
+require('./config/passport.js')(passport)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,8 +34,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.use(passport.initialize());
+app.use(passport.session());
+
+require('./routes/users.js')(app, passport)
+// app.use('/', index);
+// app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -42,6 +47,7 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
