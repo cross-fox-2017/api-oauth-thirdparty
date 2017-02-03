@@ -7,6 +7,7 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy  = require('passport-twitter').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var GithubStrategy = require('passport-github2').Strategy;
+var RegisterStrategy = require('passport-local-register').Strategy;
 
 var User = require('../models/user.js')
 
@@ -28,8 +29,7 @@ module.exports = function(passport){
         else {
           var newUser = new User()
           newUser.username = username;
-          newUser.password = password;
-          newUser.username = hash.generate(username);
+          newUser.password = hash.generate(password);
           newUser.save(function(err){
             if(err) {throw err};
             return done(null, newUser)
@@ -38,6 +38,33 @@ module.exports = function(passport){
       });
     })
   )
+
+  passport.use(new RegisterStrategy(
+    function verify(username, password, done) {
+      User.findOne({
+        'username' : username
+      }, function(err, user) {
+        if (err) {
+          return done(err);
+        }
+        if (!user) {
+          return done(); // see section below
+        }
+        if (!user.verifyPassword(password)) {
+          return done(null, false);
+        }
+        done(null, user);
+      });
+    }, function create(username, password, done) {
+      var newUser = new User()
+      newUser.username = username;
+      newUser.password = hash.generate(password);
+      newUser.save(function(err){
+        if(err) {throw err};
+        return done(null, newUser)
+      });
+    }
+  ));
 
   passport.use(new FacebookStrategy({
     clientID        : process.env.facebook_clientID,

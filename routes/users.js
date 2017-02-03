@@ -54,5 +54,9 @@ module.exports = function(app, passport){
       console.log('success');
     });
 
-
+  app.post('/login', passport.authenticate('localRegister', {
+    failureRedirect : '/login'
+  }), function(req, res) {
+    res.redirect('/');
+  });
 }
