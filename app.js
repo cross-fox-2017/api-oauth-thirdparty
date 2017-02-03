@@ -4,7 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+
 const passport = require('passport');
+const Strategy = require('passport-facebook').Strategy;
 // const FacebookTokenStrategy = require('passport-facebook-token');
 
 var index = require('./routes/index');
@@ -14,6 +16,23 @@ var api = require('./routes/api')
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/oauth');
 mongoose.Promise = global.Promise;
+
+passport.use(new Strategy({
+    clientID: '267057420394411',
+    clientSecret: '0201668b55a2a69a5f912d00a0fce1cc',
+    callbackURL: 'http://localhost:3000/login/facebook/return'
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    return cb(null, profile);
+}));
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
 
 var app = express();
 
@@ -29,21 +48,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(passport.initialize());
-// app.use(passport.session());
+app.use(require('express-session')({ secret: 'secret', resave: true, saveUninitialized: true }));
 
-// passport.use(new FacebookTokenStrategy({
-//       clientID: "267057420394411",
-//       clientSecret: "0201668b55a2a69a5f912d00a0fce1cc"
-//   },
-//   function(accessToken, refreshToken, profile, done) {
-//       User.handleAuthentication(accessToken, refreshToken, profile, done, function(err, user) {
-//           console.log("handleAuthentication user is " + JSON.stringify(user));
-//           console.log("handleAuthentication error is " + JSON.stringify(err));
-//           done(err, user);
-//       });
-//   }
-// ));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', index);
 app.use('/api/users', users);

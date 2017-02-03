@@ -5,20 +5,35 @@ const Users = require('../models/users');
 const controller = require('../controllers/oauth');
 const oauth = require('../auth');
 const passport = require('passport');
-const findOrCreate = require('mongoose-findorcreate')
-const FacebookTokenStrategy = require('passport-facebook-token');
+// const findOrCreate = require('mongoose-findorcreate')
+// const FacebookTokenStrategy = require('passport-facebook-token');
 
-passport.use(new FacebookTokenStrategy({
-    clientID: '267057420394411',
-    clientSecret: '0201668b55a2a69a5f912d00a0fce1cc'
-  }, function(accessToken, refreshToken, profile, done) {
-    // Users.findOrCreate({id: profile.id}, function (error, user) {
-      console.log(accessToken, refreshToken, profile, done);
-      console.log("OK");
-      return done(error, user);
-    // });
-  }
-));
+// passport.use(new FacebookTokenStrategy({
+//     clientID: '267057420394411',
+//     clientSecret: '0201668b55a2a69a5f912d00a0fce1cc'
+//   }, function(accessToken, refreshToken, profile, done) {
+//     // Users.findOrCreate({id: profile.id}, function (error, user) {
+//       console.log(accessToken, refreshToken, profile, done);
+//       console.log("OK");
+//       return done(error, user);
+//     // });
+//   }
+// ));
+
+router.get('/login/facebook',
+  passport.authenticate('facebook'));
+
+router.get('/login/facebook/return',
+  passport.authenticate('facebook', { successRedirect: 'http://google.com', failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+router.get('/profile',
+  require('connect-ensure-login').ensureLoggedIn(),
+  function(req, res){
+    res.render('profile', { user: req.user });
+  });
 
 // passport.use(new FacebookTokenStrategy({
 //     clientID        : "267057420394411",
