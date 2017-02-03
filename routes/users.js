@@ -6,8 +6,8 @@ var usersController = require('../controller/usersController.js')
 
 /* GET users listing. */
 module.exports = function(app, passport){
-  app.get('/', usersController.getAllUser);
-  app.post('/', usersController.createUser);
+  // app.get('/', usersController.getAllUser);
+  // app.post('/', usersController.createUser);
   app.post('/signup', passport.authenticate('local-signup', {
     failureRedirect: '/signup',
     failureFlash: true
