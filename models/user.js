@@ -20,6 +20,11 @@ var userSchema = new Schema({
     id:String,
     token:String,
     name:String
+  },
+  github:{
+    id:String,
+    token:String,
+    name:String
   }
 });
 
