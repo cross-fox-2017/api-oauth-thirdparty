@@ -7,12 +7,122 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var index = require('./routes/index');
 var users = require('./routes/users');
-
+var passport = require('passport')
 var app = express();
+//model require
+var User = require('./models/user.js')
+app.use(passport.initialize())
+app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(passport.session());
+//strategies
+var FacebookStrategy = require('passport-facebook').Strategy
+var TwitterStrategy = require('passport-twitter').Strategy
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+
+passport.serializeUser(function(user,done){
+  done(null,user.id)
+})
+passport.deserializeUser(function(id,done){
+  User.findById(id,function(err,user){
+    done(err,user)
+  })
+})
+//facebook-oauth
+passport.use(new FacebookStrategy({
+    clientID: '150196128819994',
+    clientSecret: '58ada52c316d364628e21caa21d93e57',
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    process.nextTick(function(){
+	    		User.findOne({'facebook.id': profile.id}, function(err, user){
+	    			if(err)
+	    				return done(err);
+	    			if(user)
+	    				return done(null, user);
+	    			else {
+	    				var newUser = new User();
+	    				newUser.facebook.id = profile.id;
+	    				newUser.facebook.token = accessToken;
+	    				newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
+
+
+	    				newUser.save(function(err){
+	    					if(err)
+	    						throw err;
+	    					return done(null, newUser);
+	    				})
+	    				console.log(profile);
+	    			}
+	    		});
+	    	});
+  }
+));
+//twitter-oauth
+passport.use(new TwitterStrategy({
+    consumerKey: 'jIrcD2fFilY175sFeNf2DzAPM',
+    consumerSecret: '7WBdYizFIlTk1egoDy1Z8GNcSJ1JZvtanXPuhDF49RacCkFYRX',
+    callbackURL: "http://localhost:3000/auth/twitter/callback"
+  },
+  function(token, tokenSecret, profile, done) {
+    process.nextTick(function(){
+	    		User.findOne({'twitter.id': profile.id}, function(err, user){
+	    			if(err)
+	    				return done(err);
+	    			if(user)
+	    				return done(null, user);
+	    			else {
+	    				var newUser = new User();
+	    				newUser.twitter.id = profile.id;
+	    				newUser.twitter.token = token;
+	    				newUser.twitter.name = profile.username;
+
+	    				newUser.save(function(err){
+	    					if(err)
+	    						throw err;
+	    					return done(null, newUser);
+	    				})
+	    				console.log(profile);
+	    			}
+	    		});
+	    	});
+  }
+));
+
+//google-oauth
+passport.use(new GoogleStrategy({
+    clientID: '950493030103-ug59dkhnh9p7kqlg9gc42ru2o2ihrcuk.apps.googleusercontent.com',
+    clientSecret: 'PBcmmyXVVxpT3API581xyFzW',
+    callbackURL: "http://localhost:3000/auth/google/callback"
+  },
+  function(token, tokenSecret, profile, done) {
+    process.nextTick(function(){
+	    		User.findOne({'google.id': profile.id}, function(err, user){
+	    			if(err)
+	    				return done(err);
+	    			if(user)
+	    				return done(null, user);
+	    			else {
+	    				var newUser = new User();
+	    				newUser.google.id = profile.id;
+	    				newUser.google.token = token;
+	    				newUser.google.name = profile.displayname;
+
+	    				newUser.save(function(err){
+	    					if(err)
+	    						throw err;
+	    					return done(null, newUser);
+	    				})
+	    				console.log(profile);
+	    			}
+	    		});
+	    	});
+  }
+));
 
 //connect mongoose
 mongoose.connect('mongodb://localhost/oauth')
-mongoose.Promise=global.Promise
+mongoose.Promise = global.Promise
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +135,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/', index);
 app.use('/users', users);

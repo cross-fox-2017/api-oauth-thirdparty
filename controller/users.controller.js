@@ -1,37 +1,36 @@
 var hash = require('password-hash')
-const db = require('../models');
-const users = db.User
 var jwt = require('jsonwebtoken')
 var express = require('express');
 var passport = require('passport');
-var Strategy = require('passport-local').Strategy;
 
-passport.use(new Strategy(
-  function(username, password, cb) {
-    users.findByUsername(username, function(err, user) {
-      if (err) { return cb(err); }
-      if (!user) { return cb(null, false); }
-      if (user.password != password) { return cb(null, false); }
-      return cb(null, user);
-    });
-  }));
 
 module.exports={
   signUp: function(req,res){
-    user.create({
+    var newUser = User({
       name:req.body.name,
       email:req.body.email,
       username:req.body.username,
-      password:req.body.password
-    }).then(function(data){
-      res.send(data)
-    })
+      password:req.body.password,
+    });
+    newUser.save(function(err) {
+      if (err) throw err;
+      res.send(newUser);
+    });
   },
   signIn: function(req,res){
-    passport.authenticate('local', { failureRedirect: '/login' }),
-      function(req, res) {
-        res.send('you are logged in');
-    }
+    User.findOne({username:req.body.username}).then(function(user){
+      console.log(user.password);
+      if(!user){
+        res.send('user not found!')
+      }
+      else if(user.password !== req.body.password){
+        res.send('wrong pass!')
+      }
+      else{
+        var token = jwt.sign({username:user.username,email:user.email},'rahasiabangetnih')
+        res.send({token:token})
+      }
+    })
   }
 
 }

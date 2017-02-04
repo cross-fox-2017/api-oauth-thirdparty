@@ -2,23 +2,25 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
 var userSchema = new Schema({
-  name: {
-    type:String,
-    required:true
+  name:String,
+  email:String,
+  username:String,
+  password:String,
+  facebook:{
+    id:String,
+    token:String,
+    name:String
   },
-  email: {
-    type:String,
-    required:true
+  twitter:{
+    id:String,
+    token:String,
+    name:String
   },
-  username: {
-    type:String,
-    required:true
-  },
-  password: {
-    type:String,
-    required:true
+  google:{
+    id:String,
+    token:String,
+    name:String
   }
-
 });
 
 var User = mongoose.model('users',userSchema)
