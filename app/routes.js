@@ -1,9 +1,7 @@
 module.exports = function(app, passport) {
 
     app.get('/', function(req, res, next) {
-        res.render('index.ejs', {
-            title: "Testing"
-        })
+        res.render('index.ejs')
     })
 
     app.get('/login', function(req, res, next) {
