@@ -39,7 +39,7 @@ app.use('/', index);
 app.use('/users', users);
 
 //required for passport
-app.use(session({}))
+app.use(session({secret: proscess.env.SESSION_SECRET}))
 
 
 
