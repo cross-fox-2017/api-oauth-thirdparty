@@ -3,7 +3,7 @@ const FacebookStrategy = require('passport-facebook').Strategy
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 const config = require('../oauth')
-const User = require('../models/users')
+const Users = require('../models/users')
 
 module.exports = (passport) => {
   passport.serializeUser(function(user, done) {

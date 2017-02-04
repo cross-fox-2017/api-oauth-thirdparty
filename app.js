@@ -27,8 +27,8 @@ mongoose.Promise = global.Promise;
 var app = express();
 
 app.use(session({
-  secret: 'idabaguschahyadhegana120189',
-  key: 'secret',
+  secret: 'keyboard cat',
+  key: 'sid',
   resave: false,
   saveUninitialized: true
 }))
@@ -36,7 +36,8 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-require('./config/passport')(passport)
+let passportJS = require('./config/passport')
+passportJS(passport)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

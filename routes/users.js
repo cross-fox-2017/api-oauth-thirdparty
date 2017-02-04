@@ -3,7 +3,7 @@ var router = express.Router();
 const controller = require('../controllers/users')
 
 /* GET users listing. */
-router.post('/', controller.verify, controller.signup)
+router.post('/', controller.signup)
 
 router.get('/', controller.verify, controller.getUsers)
 

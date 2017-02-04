@@ -18,7 +18,7 @@ module.exports = {
       res.send(`Added new User!\n${user}`);
     });
   },
-  getUsers: (req,res) => {
+  getUsers: (req, res) => {
     Users.find({}, (err, users) => {
       if (err) throw err;
 
@@ -26,7 +26,7 @@ module.exports = {
       res.send(users);
     });
   },
-  delete: (req,res) => {
+  delete: (req, res) => {
     // get the user
     Users.findByIdAndRemove(req.params.id, (err, user) => {
       if (err) {
@@ -35,16 +35,16 @@ module.exports = {
       } else {
         // we have deleted the user
         let response = {
-            message: "User successfully deleted",
-            id: req.params.id
+          message: "User successfully deleted",
+          id: req.params.id
         };
         res.send(response);
       }
     });
   },
-  verify: (req,res,next) => {
+  verify: (req, res, next) => {
     let decoded = jwt.verify(req.header('auth'), 'secret');
-    if(decoded) {
+    if (decoded) {
       next()
     } else {
       res.send("You don't have access!")
