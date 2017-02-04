@@ -6,35 +6,37 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 const passport = require('passport');
-const Strategy = require('passport-facebook').Strategy;
-// const FacebookTokenStrategy = require('passport-facebook-token');
+const mongoose = require('mongoose');
+const session = require('express-session');
+require('dotenv').config()
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var api = require('./routes/api')
+var api = require('./routes/api');
+var auth = require('./routes/auth');
 
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/oauth');
+mongoose.connect(`${process.env.MONGODB_URI}`, function(err) {
+  if (err) {
+    console.log(err)
+  } else {
+    console.log(`connected to ${process.env.PORT} ${process.env.MONGODB_URI}`)
+  }
+})
 mongoose.Promise = global.Promise;
 
-passport.use(new Strategy({
-    clientID: '267057420394411',
-    clientSecret: '0201668b55a2a69a5f912d00a0fce1cc',
-    callbackURL: 'http://localhost:3000/login/facebook/return'
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    return cb(null, profile);
-}));
-
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
-
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
-
 var app = express();
+
+app.use(session({
+  secret: 'idabaguschahyadhegana120189',
+  key: 'secret',
+  resave: false,
+  saveUninitialized: true
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+require('./config/passport')(passport)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,18 +46,16 @@ app.set('view engine', 'ejs');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(require('express-session')({ secret: 'secret', resave: true, saveUninitialized: true }));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/', index);
 app.use('/api/users', users);
 app.use('/api', api);
+app.use('/auth', auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -75,4 +75,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+module.exports = app
