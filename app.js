@@ -40,8 +40,11 @@ app.use('/users', users);
 
 //required for passport
 app.use(session({secret: proscess.env.SESSION_SECRET}))
+app.use(passport.initialize())
+app.use(passport.session())//persistent login sessions
+app.use(flash());//use connect-flash for flash message stored in session
 
-
+require('./app/routes.js')(app,passport)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
