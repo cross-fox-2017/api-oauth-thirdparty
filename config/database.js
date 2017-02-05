@@ -1,3 +1,3 @@
 module.exports = {
-  'url':'mongodb://localhost/login-oauth'
+    'url': 'mongodb://localhost/oauth'
 }

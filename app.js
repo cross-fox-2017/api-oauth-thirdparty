@@ -12,7 +12,7 @@ const session = require('express-session');
 
 
 mongoose.Promise = global.Promise;
-const configDB = require('./config/database.js');//connect to mongoDB
+const configDB = require('./config/database.js'); //connect to mongoDB
 mongoose.connect(configDB.url)
 
 var app = express();
@@ -25,45 +25,52 @@ app.set('view engine', 'ejs');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
 //required for passport
-app.use(session({secret: process.env.SESSION_SECRET}))
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true
+}))
 app.use(passport.initialize())
-app.use(passport.session())//persistent login sessions
-app.use(flash());//use connect-flash for flash message stored in session
+app.use(passport.session()) //persistent login sessions
+app.use(flash()); //use connect-flash for flash message stored in session
 
 
 // var index = require('./routes/index');
 // var users = require('./routes/users');
 // app.use('/', index);
 // app.use('/users', users);
-require('./app/routes.js')(app, passport)//proses routing dipindah ke folder app/routes.js, jika empat sintak diatas diaktifkan, maka routing akan di tulis di rotes
-
+require('./app/routes.js')(app, passport)
+require('./config/passport')(passport);
+// (app, passport) //proses routing dipindah ke folder app/routes.js, jika empat sintak diatas diaktifkan, maka routing akan di tulis di rotes
+// require('./config/passport')
 
 
 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
