@@ -11,21 +11,31 @@ var facebook = require('./routes/auth/facebook');
 var google = require('./routes/auth/google');
 var twitter = require('./routes/auth/twitter');
 var passport = require('passport');
-// var FacebookStrategy = require('passport-facebook').Strategy
-//
-// passport.use(new FacebookStrategy({
-//     clientID: 741874725977340,
-//     clientSecret: "efb55922741c35217042db93ffdbd72d",
-//     callbackURL: "http://localhost:3000/auth/facebook/callback"
-//   },
-//   function(accessToken, refreshToken, profile, cb) {
-//     User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-//       return cb(err, user);
-//     });
-//   }
-// ));
+let session = require('express-session')
 
 var app = express();
+var mongoose = require('mongoose')
+
+// mongoose.connect('mongodb://localhost/lostandfound', function (err) {
+//   if (err) throw err
+//   console.log('database connected using mongoose')
+// })
+
+// ====== Passport & Session ======
+
+app.use(session({
+  secret: 'keyboard cat',
+  key: 'sid',
+  resave: false,
+  saveUninitialized: true
+}))
+
+app.use(passport.initialize())
+app.use(passport.session()) // persistent login sessions
+
+require('./config/passport')(passport)
+
+// ======= END =======
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
