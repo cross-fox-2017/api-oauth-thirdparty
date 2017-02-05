@@ -7,9 +7,25 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var passport = require('passport')
+var flash = require('connect-flash')
+var session = require('express-session')
+
+var mongoose = require("mongoose")
+var configDB = require('./config/database.js')
+
+mongoose.connect(configDB.url)
+
+require('./config/passport')(passport)
 
 var app = express();
+app.use(session({secret:"secret",
+                 saveUninitialized:true,
+                 resave:true}));
 
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(flash())
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
