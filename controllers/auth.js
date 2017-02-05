@@ -154,7 +154,9 @@ module.exports = function (passport) {
     console.log(profile)
     User.findOne({'github.id': profile.id}, function (err, user) {
       if (err) return done(err)
-      if (user) {return done(null, user)
+
+      if (user) {
+        return done(null, user)
       } else {
         var newUser = new User()
         newUser.github.id = profile.id
