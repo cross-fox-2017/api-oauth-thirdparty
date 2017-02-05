@@ -26,50 +26,50 @@ module.exports = function (passport) {
   })
 
   /* local */
-  // passport.use('local-signup', new LocalStrategy({
-  //   passReqToCallback: true
-  // }, function signup (req, username, password, done) {
-  //   User.findOne({username: username}, function (err, user) {
-  //     if (err) {return done(err)}
-  //     else if (user) {return done(null, false)}else {
-  //       var newUser = new User()
-  //       newUser.username = username
-  //       newUser.password = hash.generate(password)
-  //       newUser.save(function (err) {
-  //         if (err) {throw err}
-  //         return done(null, newUser)
-  //       })
-  //     }
-  //   })
-  // })
-  // )
+  passport.use('local-signup', new LocalStrategy({
+    passReqToCallback: true
+  }, function signup (req, username, password, done) {
+    User.findOne({username: username}, function (err, user) {
+      if (err) {return done(err)}
+      else if (user) {return done(null, false)}else {
+        var newUser = new User()
+        newUser.username = username
+        newUser.password = hash.generate(password)
+        newUser.save(function (err) {
+          if (err) {throw err}
+          return done(null, newUser)
+        })
+      }
+    })
+  })
+  )
 
-  // passport.use(new RegisterStrategy(
-  //   function verify (username, password, done) {
-  //     User.findOne({
-  //       'username': username
-  //     }, function (err, user) {
-  //       if (err) {
-  //         return done(err)
-  //       }
-  //       if (!user) {
-  //         return done() // see section below
-  //       }
-  //       if (!user.verifyPassword(password)) {
-  //         return done(null, false)
-  //       }
-  //       done(null, user)
-  //     })
-  //   }, function create (username, password, done) {
-  //     var newUser = new User()
-  //     newUser.username = username
-  //     newUser.password = hash.generate(password)
-  //     newUser.save(function (err) {
-  //       if (err) {throw err}
-  //       return done(null, newUser)
-  //     })
-  //   }
-  // ))
+  passport.use(new RegisterStrategy(
+    function verify (username, password, done) {
+      User.findOne({
+        'username': username
+      }, function (err, user) {
+        if (err) {
+          return done(err)
+        }
+        if (!user) {
+          return done() // see section below
+        }
+        if (!user.verifyPassword(password)) {
+          return done(null, false)
+        }
+        done(null, user)
+      })
+    }, function create (username, password, done) {
+      var newUser = new User()
+      newUser.username = username
+      newUser.password = hash.generate(password)
+      newUser.save(function (err) {
+        if (err) {throw err}
+        return done(null, newUser)
+      })
+    }
+  ))
 
   /* facebook */
   passport.use(new FacebookStrategy({
@@ -146,29 +146,28 @@ module.exports = function (passport) {
   // ))
 
   /* github */
-  // passport.use(new GithubStrategy({
-  //   clientID: process.env.github_clientID,
-  //   clientSecret: process.env.github_clientSecret,
-  //   callbackURL: process.env.github_callbackURL
-  // }, function (accessToken, refreshToken, profile, done) {
-  //   console.log(profile)
-  //   User.findOne({'github.id': profile.id}, function (err, user) {
-  //     if (err) return done(err)
-  //     if (user) {return done(null, user)
-  //     } else {
-  //       var newUser = new User()
-  //       newUser.github.id = profile.id
-  //       newUser.github.token = accessToken
-  //       newUser.github.displayName = profile.displayName
-  //       newUser.github.username = profile.username
-  //       // newUser.github.email = profile.emails[0].value
-  //       newUser.save(function (err) {
-  //         if (err) throw err
-  //         return done(null, newUser)
-  //       })
-  //     }
-  //   })
-  // })
-  // )
-
+  passport.use(new GithubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: process.env.GITHUB_CALLBACK
+  }, function (accessToken, refreshToken, profile, done) {
+    console.log(profile)
+    User.findOne({'github.id': profile.id}, function (err, user) {
+      if (err) return done(err)
+      if (user) {return done(null, user)
+      } else {
+        var newUser = new User()
+        newUser.github.id = profile.id
+        newUser.github.token = accessToken
+        newUser.github.displayName = profile.displayName
+        newUser.github.username = profile.username
+        // newUser.github.email = profile.emails[0].value
+        newUser.save(function (err) {
+          if (err) throw err
+          return done(null, newUser)
+        })
+      }
+    })
+  })
+  )
 }

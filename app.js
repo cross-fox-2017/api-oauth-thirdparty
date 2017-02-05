@@ -16,8 +16,8 @@ var app = express()
 
 mongoose.connect('mongodb://localhost/oauth')
 
+/* setup controller */
 require('./controllers/auth.js')(passport)
-// require('./config/passport.js')(passport)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -36,8 +36,8 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 require('./routes/users.js')(app, passport)
+
 app.use('/', index)
-// app.use('/users', users)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
