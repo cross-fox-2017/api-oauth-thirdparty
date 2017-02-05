@@ -5,7 +5,8 @@ var hash = require('password-hash')
 var LocalStrategy = require('passport-local').Strategy
 var FacebookStrategy = require('passport-facebook').Strategy
 var TwitterStrategy = require('passport-twitter').Strategy
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+// var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+var GoogleStrategy = require('passport-google-oauth').Strategy
 var GithubStrategy = require('passport-github2').Strategy
 var RegisterStrategy = require('passport-local-register').Strategy
 
@@ -71,35 +72,37 @@ module.exports = function (passport) {
   // ))
 
   /* facebook */
-  // passport.use(new FacebookStrategy({
-  //   clientID: process.env.facebook_clientID,
-  //   clientSecret: process.env.facebook_clientSecret,
-  //   callbackURL: process.env.facebook_callbackURL
-  // }, function (accessToken, refreshToken, profile, done) {
-  //   User.findOne({'facebook.id': profile.id}, function (err, user) {
-  //     if (err) return done(err)
-  //     if (user) {return done(null, user)
-  //     } else {
-  //       var newUser = new User()
-  //       newUser.facebook.id = profile.id
-  //       newUser.facebook.token = accessToken
-  //       newUser.facebook.displayName = profile.displayName
-  //       // newUser.facebook.email = profile.email[0].value
-  //       newUser.save(function (err) {
-  //         if (err) throw err
-  //         return done(null, newUser)
-  //       })
-  //     }
-  //   })
-  // }
-  // ))
+  passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: process.env.FACEBOOK_CALLBACK
+  }, function (accessToken, refreshToken, profile, done) {
+    User.findOne({'facebook.id': profile.id}, function (err, user) {
+      if (err) return done(err)
+      if (user) {return done(null, user)
+      } else {
+        var newUser = new User()
+        newUser.facebook.id = profile.id
+        newUser.facebook.token = accessToken
+        newUser.facebook.displayName = profile.displayName
+        // newUser.facebook.email = profile.email[0].value
+        newUser.save(function (err) {
+          if (err) throw err
+          return done(null, newUser)
+        })
+      }
+    })
+  }
+  ))
 
   /* twitter */
+  let tweetAccessToken = process.env.TWEET_ACCESS_TOKEN
+  let tweetTokenSecret = process.env.TWEET_ACCESS_TOKEN_SECRET
   passport.use(new TwitterStrategy({
     consumerKey: process.env.TWEET_CUSTOMER_KEY,
     consumerSecret: process.env.TWEET_CUSTOMER_SECRET,
     callbackURL: 'http://localhost:3000/auth/twitter/callback'
-  }, function (accessToken, tokenSecret, profile, done) {
+  }, function (tweetAccessToken, tweetTokenSecret, profile, done) {
     User.findOne({'twitter.id': profile.id}, function (err, user) {
       if (err) return done(err)
       if (user) {return done(null, user)
@@ -119,9 +122,9 @@ module.exports = function (passport) {
 
   /* google */
   // passport.use(new GoogleStrategy({
-  //   clientID: process.env.google_clientID,
-  //   clientSecret: process.env.google_clientSecret,
-  //   callbackURL: process.env.google_callbackURL
+  //   clientID: process.env.google_client_id,
+  //   clientSecret: process.env.google_client_secret,
+  //   callbackURL: process.env.google_redirect_uris
   // // redirect_uri: process.env.google_redirect_uri
   // }, function (accessToken, refreshToken, profile, done) {
   //   User.findOne({'google.id': profile.id}, function (err, user) {
