@@ -29,8 +29,8 @@ passport.deserializeUser(function(id,done){
 })
 //facebook-oauth
 passport.use(new FacebookStrategy({
-    clientID: '150196128819994',
-    clientSecret: '58ada52c316d364628e21caa21d93e57',
+    clientID: '585091641689115',
+    clientSecret: 'a9a26e1ff0ede900a8ca0134ee839402',
     callbackURL: "http://localhost:3000/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
@@ -44,9 +44,7 @@ passport.use(new FacebookStrategy({
 	    				var newUser = new User();
 	    				newUser.facebook.id = profile.id;
 	    				newUser.facebook.token = accessToken;
-	    				newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
-
-
+	    				newUser.facebook.name = profile.displayName;
 	    				newUser.save(function(err){
 	    					if(err)
 	    						throw err;
