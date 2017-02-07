@@ -16,9 +16,18 @@
 
         <p>Login or Register with:</p>
 
+        <form action="/api/signin" method="post">
+          <p>Username</p>
+          <input type="text" name="username" value="">
+          <p>Password</p>
+          <input type="text" name="password" value=""><br/>
+          <button type="submit" name="button">Log in</button>
+        </form>
+
         <a href="/auth/facebook/login" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a>
-        <a href="/auth/twitter/login" class="btn btn-primary"><span class="fa fa-facebook"></span> Twitter</a>
-        <a href="/auth/google/login" class="btn btn-primary"><span class="fa fa-facebook"></span> Google</a>
+        <a href="/auth/twitter/login" class="btn btn-primary"><span class="fa fa-twitter"></span> Twitter</a>
+        <a href="/auth/google/login" class="btn btn-primary"><span class="fa google"></span> Google</a>
+        <a href="/auth/github/login" class="btn btn-primary"><span class="fa fa-github"></span> Github</a>
 
     </div>
 

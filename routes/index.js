@@ -13,11 +13,15 @@ router.get('/auth/google/login', passport.authenticate('google', {scope: ['profi
 
 router.get('/auth/facebook/login', passport.authenticate('facebook', {scope: 'email'}))
 
+router.get('/auth/github/login', passport.authenticate('github'));
+
 router.use('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/auth/login/success', failureRedirect: '/auth/login/failed' }))
 
 router.use('/auth/google/callback', passport.authenticate('google', { successRedirect: '/auth/login/success', failureRedirect: '/auth/login/failed' }))
 
 router.use('/auth/twitter/callback', passport.authenticate('twitter', { successRedirect: '/auth/login/success', failureRedirect: '/auth/login/failed' }))
+
+router.use('/auth/github/callback', passport.authenticate('github', { successRedirect: '/auth/login/success', failureRedirect: '/auth/login/failed' }))
 
 
 router.get('/auth/login/failed', function (req, res) {
