@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var passport = require('passport')
+var config = require('./config.json')
 var app = express();
 //model require
 var User = require('./models/user.js')
@@ -29,8 +30,8 @@ passport.deserializeUser(function(id,done){
 })
 //facebook-oauth
 passport.use(new FacebookStrategy({
-    clientID: '585091641689115',
-    clientSecret: 'a9a26e1ff0ede900a8ca0134ee839402',
+    clientID: config.clientID,
+    clientSecret: config.clientSecret,
     callbackURL: "http://localhost:3000/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
@@ -58,8 +59,8 @@ passport.use(new FacebookStrategy({
 ));
 //twitter-oauth
 passport.use(new TwitterStrategy({
-    consumerKey: 'jIrcD2fFilY175sFeNf2DzAPM',
-    consumerSecret: '7WBdYizFIlTk1egoDy1Z8GNcSJ1JZvtanXPuhDF49RacCkFYRX',
+    consumerKey: config.consumerKey,
+    consumerSecret: config.consumerSecret,
     callbackURL: "http://localhost:3000/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
@@ -89,8 +90,8 @@ passport.use(new TwitterStrategy({
 
 //google-oauth
 passport.use(new GoogleStrategy({
-    clientID: '950493030103-ug59dkhnh9p7kqlg9gc42ru2o2ihrcuk.apps.googleusercontent.com',
-    clientSecret: 'PBcmmyXVVxpT3API581xyFzW',
+    clientID: config.clientID_google,
+    clientSecret: config.clientSecret_google,
     callbackURL: "http://localhost:3000/auth/google/callback"
   },
   function(token, tokenSecret, profile, done) {
