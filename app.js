@@ -4,23 +4,32 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-
-// mongoose
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/oauth');
 mongoose.Promise = global.Promise;
+const session = require('express-session');
+const passport = require('passport');
+const FacebookStrategy = require('passport-facebook').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const User = require('./models/user');
+const config = require('./config');
 
 var index = require('./routes/index');
-// var users = require('./routes/users');
-
-var apiUsers = require('./routes/api/users');
-var apiSignin = require('./routes/api/signin');
-var apiSignup = require('./routes/api/signup');
 
 var app = express();
 
-
+app.use(require('express-session')({secret: config.localAuth.secret, resave: false, saveUninitialized: false}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser(function(user,done){
+  done(null,user.id)
+})
+passport.deserializeUser(function(id,done){
+  User.findById(id,function(err,user){
+    done(err,user)
+  })
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,10 +44,81 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/api/users', apiUsers);
-app.use('/api/signin', apiSignin)
-app.use('/api/signup', apiSignup)
 
+passport.use(new FacebookStrategy({
+  clientID    : config.facebookAuth.clientID,
+  clientSecret: config.facebookAuth.clientSecret,
+  callbackURL : 'http://localhost:3000/auth/facebook/callback'
+},
+function(accessToken, refreshToken, profile, done) {
+  process.nextTick(function() {
+    User.findOne({'facebook.id':profile.id}, function(err,user) {
+      if (err) return done (err);
+      if (user) return done (null, user);
+      else {
+        var newUser = new User();
+        newUser.facebook.id = profile.id;
+        newUser.facebook.token = accessToken;
+        newUser.facebook.name = profile.displayName;
+        newUser.save(function(err) {
+          if(err) throw err;
+          return done(null, newUser);
+          console.log(profile);
+        })
+      }
+    })
+  })
+}))
+
+passport.use(new TwitterStrategy({
+  consumerKey    : config.twitterAuth.consumerKey,
+  consumerSecret : config.twitterAuth.consumerSecret,
+  callbackURL    : 'http://localhost:3000/auth/twitter/callback'
+},
+function(token, tokenSecret, profile, done) {
+  process.nextTick(function() {
+    User.findOne({'twitter.id':profile.id}, function(err,user) {
+      if (err) return done (err);
+      if (user) return done (null, user);
+      else {
+        var newUser = new User();
+        newUser.twitter.id = profile.id;
+        newUser.twitter.token = token;
+        newUser.twitter.name = profile.username;
+        newUser.save(function(err) {
+          if(err) throw err;
+          return done(null, newUser);
+          console.log(profile);
+        })
+      }
+    })
+  })
+}))
+
+passport.use(new GoogleStrategy({
+  clientID    : config.googleAuth.clientID,
+  clientSecret: config.googleAuth.clientSecret,
+  callbackURL : 'http://localhost:3000/auth/google/callback'
+},
+function(token, tokenSecret, profile, done) {
+  process.nextTick(function() {
+    User.findOne({'google.id':profile.id}, function(err,user) {
+      if (err) return done (err);
+      if (user) return done (null, user);
+      else {
+        var newUser = new User();
+        newUser.google.id = profile.id;
+        newUser.google.token = token;
+        newUser.google.name = profile.displayName;
+        newUser.save(function(err) {
+          if(err) throw err;
+          return done(null, newUser);
+          console.log(profile);
+        })
+      }
+    })
+  })
+}))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -56,5 +136,3 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-module.exports = app;
